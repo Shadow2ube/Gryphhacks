@@ -184,7 +184,7 @@ int main() {
 
   svr.Get("/api/events/all", RES {
     pqxx::result r = get_from_sql("SELECT id, user_id, min_age, is_recurring, name, description, long, lat, "
-                                  "time_start, time_end FROM events");
+                                  "time_start, time_end, location FROM events");
 
     json j = json::array();
     for (auto row: r) {
@@ -199,6 +199,7 @@ int main() {
           {"lat", row[7].as<float>()},
           {"time_start", row[8].as<std::string>()},
           {"time_end", row[9].as<std::string>()},
+          {"location", row[10].as<std::string>()},
       };
     }
     res.set_content(j.dump(), "application/json");
@@ -242,7 +243,7 @@ int main() {
         std::string hashed = std::string(sha256(to_hash.c_str(), to_hash.length()));
         std::cout << hashed << std::endl;
         if (r[0][0].as<std::string>() != hashed) throw std::exception();
-//        add_to_sql("INSERT INTO sessions")
+//        add_to_sql("INSERT INTO sessions (user_id, session_uuid, create_date)")
       } catch (const std::exception &e) {
         res.set_content("INVALID EMAIL OR PASSWORD", "text/plain");
         return;
