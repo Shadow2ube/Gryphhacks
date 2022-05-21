@@ -1,7 +1,8 @@
-// #define CPPHTTPLIB_OPENSSL_SUPPORT
+//#define CPPHTTPLIB_OPENSSL_SUPPORT
 
 #include <iostream>
 #include <string>
+#include <chrono>
 #include "httplib.h"
 #include "json.hpp"
 #include <pqxx/pqxx>
@@ -14,6 +15,7 @@
 #define SQL_CONN pqxx::connection CONN(SQL_URL); pqxx::nontransaction conn(CONN)
 
 /*
+ * TODO:
  * POST REQUESTS:
  * login
  * add_event
@@ -22,40 +24,29 @@
  * user_create
  * org_create
  * search
- *
- * GET REQUESTS:
- * /usr/(user_id)
  */
+
 using httplib::Server;
 using nlohmann::json;
 using namespace std::chrono;
 
 int64_t snowflake_gen(int wid, int pid, int seq) {
-
-  milliseconds ms = duration_cast<milliseconds>(
-      system_clock::now().time_since_epoch()
-  );
-//  std::chrono::duration<long> dur(duration);
-
-  int t = time(nullptr);
-  std::cout << t << std::endl;
-  for (int i = 31; i >= 0; --i) {
-    std::cout << ((t >> i) & 1);
-  }
-  std::cout << std::endl;
+//  int t = std::chrono::duration_cast<std::chrono::milliseconds>((_t - ).count();
+  return 1;
 }
 
 pqxx::result get_from_sql(const std::string &s) {
-  try {
-    SQL_CONN;
-    return conn.exec(s);
-  } catch (std::exception &e) {
-    std::cerr << e.what() << std::endl;
-  }
+  // unsafe lol
+//  try {
+  SQL_CONN;
+  return conn.exec(s);
+//  } catch (std::exception &e) {
+//    std::cerr << e.what() << std::endl;
+//  }
 }
 
 int main() {
-  Server svr;
+  Server svr;  //("./ignore/cert.pem", "./ignore/key.pem");
   snowflake_gen(1, 2, 3);
 
   svr.Get(R"(/api/usr/(\d+))", RES {
@@ -80,12 +71,13 @@ int main() {
       j += {
           {"id", row[0].as<int>()},
           {"name", row[1].as<std::string>()},
-          {"lat", row[2].as<float>()},
-          {"long", row[3].as<float>()},
+          {"location", row[2].as<std::string>()},
+          {"lat", row[3].as<float>()},
+          {"long", row[4].as<float>()},
       };
     }
     res.set_content(j.dump(), "application/json");
-    res.set_content("yeet", "text/plain");
+//    res.set_content("yeet", "text/plain");
   });
 
   svr.Get("/api/events/all", RES {
@@ -110,7 +102,9 @@ int main() {
     res.set_content(j.dump(), "application/json");
   });
 
-
+  svr.Post("/api/login", RES {
+    res.set_header("a_token_4_u", "adfojlnferjkedrr3qiojur3oiuj3roijoji3fnlukwveoujihsjveokwlnvwrejlkn");
+  });
 
   svr.set_logger([](const auto &req, const auto &res) {
     std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
@@ -118,7 +112,5 @@ int main() {
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds
   svr.listen("127.0.0.1", 8080);
-
-  std::cout << "omg i wrote code" << std::endl;
   return 0;
 }
