@@ -258,7 +258,7 @@ int main() {
     std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
   });
 
-  svr.set_post_routing_handler([](const auto &req, const auto &res) {
+  svr.set_post_routing_handler([](const auto &req, auto &res) {
     res.set_header("Access-Control-Allow-Origin", "*");
   });
   svr.set_read_timeout(5, 0); // 5 seconds
