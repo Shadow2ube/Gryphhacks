@@ -85,8 +85,38 @@ int main() {
       };
     }
     res.set_content(j.dump(), "application/json");
+    res.set_content("yeet", "text/plain");
   });
 
+  svr.Get("/api/events/all", RES {
+    pqxx::result r = get_from_sql("SELECT id, user_id, min_age, is_recurring, name, description, long, lat, "
+                                  "time_start, time_end FROM events");
+
+    json j = json::array();
+    for (auto row: r) {
+      j += {
+          {"id", row[0].as<int>()},
+          {"user_id", row[1].as<int>()},
+          {"min_age", row[2].as<int>()},
+          {"is_recurring", row[3].as<bool>()},
+          {"name", row[4].as<std::string>()},
+          {"description", row[5].as<std::string>()},
+          {"long", row[6].as<float>()},
+          {"lat", row[7].as<float>()},
+          {"time_start", row[8].as<std::string>()},
+          {"time_end", row[9].as<std::string>()},
+      };
+    }
+    res.set_content(j.dump(), "application/json");
+  });
+
+
+
+  svr.set_logger([](const auto &req, const auto &res) {
+    std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
+  });
+  svr.set_read_timeout(5, 0); // 5 seconds
+  svr.set_write_timeout(5, 0); // 5 seconds
   svr.listen("127.0.0.1", 8080);
 
   std::cout << "omg i wrote code" << std::endl;
