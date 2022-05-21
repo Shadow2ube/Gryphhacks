@@ -39,6 +39,25 @@ using httplib::Server;
 using nlohmann::json;
 using namespace std::chrono;
 
+char *get_local_ip() {
+  char host[256];
+  int hostname = gethostname(host, sizeof(host));
+
+  if (hostname == -1) std::cout << "Error: Get Host Name" << std::endl;
+
+  struct hostent *host_entry;
+  host_entry = gethostbyname(host);
+
+  if (host_entry == nullptr) std::cout << "Error: Get Host Entry" << std::endl;
+
+  char *IP;
+  IP = inet_ntoa(*((struct in_addr *) host_entry->h_addr_list[0]));
+
+  return IP;
+
+}
+
+
 uint64_t seq; // yes this is weird but too bad
 uint64_t snowflake_gen(uint64_t mid) {
   uint64_t t = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
@@ -246,7 +265,7 @@ int main() {
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds
-//  svr.listen(get_local_ip(), 8080);
+  svr.listen(get_local_ip(), 8080);
   return 0;
 }
 
