@@ -88,7 +88,7 @@ char *sha256(const char *str, size_t length) {
   SHA256_Final(digest, &c);
 
   for (n = 0; n < SHA256_DIGEST_LENGTH; ++n) snprintf(&(out[n * 2]), 16 * 2, "%02x", (unsigned int) digest[n]);
-//  return {out};
+  return out;
 }
 
 std::string remove_of(std::string in, std::string remove = "\t\n\"\\") {
@@ -193,8 +193,8 @@ int main() {
                 + j["email"]["content"].get<std::string>()
                 + "\'");
 
-        std::string hashed;
-        sha256(&hashed, j["password"]["content"].get<std::string>() + std::to_string(r[0][1].as<int>()));
+        std::string to_hash = j["password"]["content"].get<std::string>() + std::to_string(r[0][1].as<int>());
+        std::string hashed = std::string(sha256(to_hash.c_str(), to_hash.length()));
         std::cout << hashed << std::endl;
         if (r[0][0].as<std::string>() != hashed) throw std::exception();
       } catch (const std::exception &e) {
