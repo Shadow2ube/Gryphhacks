@@ -6,15 +6,10 @@
 #include "httplib.h"
 #include "json.hpp"
 #include <pqxx/pqxx>
-#include <chrono>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 #include <netdb.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 
 #define RES [](const httplib::Request &req, httplib::Response &res)
@@ -56,7 +51,6 @@ char *get_local_ip() {
   return IP;
 
 }
-
 
 uint64_t seq; // yes this is weird but too bad
 uint64_t snowflake_gen(uint64_t mid) {
@@ -262,6 +256,10 @@ int main() {
 
   svr.set_logger([](const auto &req, const auto &res) {
     std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
+  });
+
+  svr.set_post_routing_handler([](const auto &req, const auto &res) {
+    res.set_header("Access-Control-Allow-Origin", "*");
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds
