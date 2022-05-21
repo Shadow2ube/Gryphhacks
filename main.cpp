@@ -39,14 +39,53 @@ using httplib::Server;
 using nlohmann::json;
 using namespace std::chrono;
 
-uint64_t seq;
+char *get_local_ip() {
+  char host[256];
+  int hostname = gethostname(host, sizeof(host));
 
-int64_t snowflake_gen(uint64_t mid) {
+  if (hostname == -1) std::cout << "Error: Get Host Name" << std::endl;
+
+  struct hostent *host_entry;
+  host_entry = gethostbyname(host);
+
+  if (host_entry == nullptr) std::cout << "Error: Get Host Entry" << std::endl;
+
+  char *IP;
+  IP = inet_ntoa(*((struct in_addr *) host_entry->h_addr_list[0]));
+
+  return IP;
+
+}
+
+uint64_t seq; // yes this is weird but too bad
+uint64_t snowflake_gen(uint64_t mid) {
   uint64_t t = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
   uint64_t out = (t << 23) | ((mid << 52) >> 40) | ((seq << 52) >> 52);
 
   seq++;
   return out;
+}
+
+std::string generate_uuid(std::string &seed) {
+  auto sum = std::accumulate(seed.begin(), seed.end(), 0);
+  std::mt19937 gen(sum);
+  std::uniform_int_distribution<> dis(0, 15);
+  std::uniform_int_distribution<> dis2(8, 11);
+
+  std::stringstream ss;
+  ss.clear();
+  int i;
+  ss << std::hex;
+  for (i = 0; i < 8; ++i) ss << dis(gen);
+  ss << "-";
+  for (i = 0; i < 4; ++i) ss << dis(gen);
+  ss << "-4";
+  for (i = 0; i < 3; ++i) ss << dis(gen);
+  ss << "-";
+  ss << dis2(gen);
+  for (i = 0; i < 12; ++i) ss << dis(gen);
+  std::cout << "uuid: " << ss.str() << std::endl;
+  return ss.str();
 }
 
 pqxx::result get_from_sql(const std::string &s) noexcept {
@@ -110,6 +149,8 @@ std::string remove_of(std::string in, std::string remove = "\t\n\"\\") {
 }
 
 int main() {
+  get_local_ip();
+
   Server svr;  //("./ignore/cert.pem", "./ignore/key.pem");
   snowflake_gen(22);
 
@@ -198,7 +239,7 @@ int main() {
       std::cout << j["email"]["content"].get<std::string>() << std::endl;
       try {
         pqxx::result r = get_from_sql(
-            "SELECT passwd, salt FROM users WHERE email=\'"
+            "SELECT passwd, salt, id FROM users WHERE email=\'"
                 + j["email"]["content"].get<std::string>()
                 + "\'");
 
@@ -206,6 +247,7 @@ int main() {
         std::string hashed = std::string(sha256(to_hash.c_str(), to_hash.length()));
         std::cout << hashed << std::endl;
         if (r[0][0].as<std::string>() != hashed) throw std::exception();
+//        add_to_sql("INSERT INTO sessions")
       } catch (const std::exception &e) {
         res.set_content("INVALID EMAIL OR PASSWORD", "text/plain");
         return;
@@ -222,6 +264,6 @@ int main() {
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds
-  svr.listen("127.0.0.1", 8080);
+  svr.listen(get_local_ip(), 8080);
   return 0;
 }
