@@ -165,15 +165,12 @@ int main() {
 
   svr.Post("/api/events/create", [sql_url](
       const httplib::Request &req,
-      httplib::Response &res,
-      const httplib::ContentReader &content_reader
+      httplib::Response &res
   ) {
     if (get_perms(sql_url, req.get_header_value("Cookie").substr(5)) <= 1) {
       res.set_content("Unauthorized", "text/plain");
       return;
     }
-//    if (req.is_multipart_form_data()) {
-//      json j = read_multipart_form(req, res, content_reader);
     json j = json::parse(req.body);
     try {
       std::stringstream ss;
@@ -194,24 +191,15 @@ int main() {
       res.set_content("invalid: " + std::string(e.what()), "text/plain");
       return;
     }
-//    } else {
-//      std::string body;
-//      content_reader([&](const char *data, size_t data_length) {
-//        body.append(data, data_length);
-//        return true;
-//      });
-//      res.set_content("INVALID FORM INPUT: " + body, "text/plain");
-//    }
   });
 
   svr.Post("/api/signup", [sql_url](
       const httplib::Request &req,
-      httplib::Response &res,
-      const httplib::ContentReader &content_reader) {
-//    if (req.is_multipart_form_data()) {
-//      json j = read_multipart_form(req, res, content_reader);
-    json j = json::parse(req.body);
+      httplib::Response &res
+  ) {
     try {
+      std::cout << req.body << std::endl;
+      json j = json::parse(req.body);
       // validate email with twilio
       uint64_t salt = gen_snowflake(1234) >> 1;
       std::stringstream ss;
@@ -223,20 +211,12 @@ int main() {
          << j["email"].get<std::string>() << "','"
          << sha256(j["password"].get<std::string>() + std::to_string(salt)) << "',"
          << salt << ","
-         << j["is_host"].get<std::string>();
+         << (j["is_host"].get<bool>() ? "true" : "false") << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
       res.set_content("invalid: " + std::string(e.what()), "text/plain");
       return;
     }
-//    } else {
-//      std::string body;
-//      content_reader([&](const char *data, size_t data_length) {
-//        body.append(data, data_length);
-//        return true;
-//      });
-//      res.set_content("INVALID FORM INPUT: " + body, "text/plain");
-//    }
   });
 
   //endregion
