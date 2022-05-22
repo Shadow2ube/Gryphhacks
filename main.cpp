@@ -15,13 +15,10 @@
 /*
  * TODO:
  * POST REQUESTS:
- * login
- * add_event
  * update_profile
  * update_event
  * user_create
  * org_create
- * search
  */
 
 using httplib::Server;
@@ -175,35 +172,71 @@ int main() {
       res.set_content("Unauthorized", "text/plain");
       return;
     }
-    if (req.is_multipart_form_data()) {
-      json j = read_multipart_form(req, res, content_reader);
-      try {
-        std::stringstream ss;
-        ss << "INSERT INTO events (id, user_id, min_age, name, description, lat, long, time_start, time_end, "
-              "location) VALUES (" << (gen_snowflake(10) >> 1) << ","
-           //              << uid_from_session(sql_url, req.get_header_value("auth")) << ","
-           << "1234" << ","
-           << std::stoi(j["min_age"]["content"].get<std::string>()) << ",'"
-           << j["name"]["content"].get<std::string>() << "','"
-           << j["description"]["content"].get<std::string>() << "',"
-           << std::stof(j["lat"]["content"].get<std::string>()) << ","
-           << std::stof(j["long"]["content"].get<std::string>()) << ", TIMESTAMP '"
-           << j["time_start"]["content"].get<std::string>() << "', TIMESTAMP '"
-           << j["time_end"]["content"].get<std::string>() << "','"
-           << j["location"]["content"].get<std::string>() << "')";
-        send_to_sql(sql_url, ss.str());
-      } catch (const std::exception &e) {
-        res.set_content("invalid: " + std::string(e.what()), "text/plain");
-        return;
-      }
-    } else {
-      std::string body;
-      content_reader([&](const char *data, size_t data_length) {
-        body.append(data, data_length);
-        return true;
-      });
-      res.set_content("INVALID FORM INPUT: " + body, "text/plain");
+//    if (req.is_multipart_form_data()) {
+//      json j = read_multipart_form(req, res, content_reader);
+    json j = json::parse(req.body);
+    try {
+      std::stringstream ss;
+      ss << "INSERT INTO events (id, user_id, min_age, name, description, lat, long, time_start, time_end, "
+            "location) VALUES (" << (gen_snowflake(10) >> 1) << ","
+         << uid_from_session(sql_url, req.get_header_value("auth")) << ","
+         //         << "1234" << ","
+         << std::stoi(j["min_age"].get<std::string>()) << ",'"
+         << j["name"].get<std::string>() << "','"
+         << j["description"].get<std::string>() << "',"
+         << std::stof(j["lat"].get<std::string>()) << ","
+         << std::stof(j["long"].get<std::string>()) << ", TIMESTAMP '"
+         << j["time_start"].get<std::string>() << "', TIMESTAMP '"
+         << j["time_end"].get<std::string>() << "','"
+         << j["location"].get<std::string>() << "')";
+      send_to_sql(sql_url, ss.str());
+    } catch (const std::exception &e) {
+      res.set_content("invalid: " + std::string(e.what()), "text/plain");
+      return;
     }
+//    } else {
+//      std::string body;
+//      content_reader([&](const char *data, size_t data_length) {
+//        body.append(data, data_length);
+//        return true;
+//      });
+//      res.set_content("INVALID FORM INPUT: " + body, "text/plain");
+//    }
+  });
+
+  svr.Post("/api/signup", [sql_url](
+      const httplib::Request &req,
+      httplib::Response &res,
+      const httplib::ContentReader &content_reader) {
+//    if (req.is_multipart_form_data()) {
+//      json j = read_multipart_form(req, res, content_reader);
+    json j = json::parse(req.body);
+    try {
+      // validate email with twilio
+      uint64_t salt = gen_snowflake(1234) >> 1;
+      std::stringstream ss;
+      ss << "INSERT INTO users (id, f_name, l_name, email, passwd, salt, is_host)"
+         << "VALUES ("
+         << (gen_snowflake(214) >> 1) << ",'"
+         << j["f_name"].get<std::string>() << "','"
+         << j["l_name"].get<std::string>() << "','"
+         << j["email"].get<std::string>() << "','"
+         << sha256(j["password"].get<std::string>() + std::to_string(salt)) << "',"
+         << salt << ","
+         << j["is_host"].get<std::string>();
+      send_to_sql(sql_url, ss.str());
+    } catch (const std::exception &e) {
+      res.set_content("invalid: " + std::string(e.what()), "text/plain");
+      return;
+    }
+//    } else {
+//      std::string body;
+//      content_reader([&](const char *data, size_t data_length) {
+//        body.append(data, data_length);
+//        return true;
+//      });
+//      res.set_content("INVALID FORM INPUT: " + body, "text/plain");
+//    }
   });
 
   //endregion

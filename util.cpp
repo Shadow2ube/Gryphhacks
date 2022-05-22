@@ -58,28 +58,6 @@ uint64_t util::gen_snowflake(uint64_t mid) {
   return out;
 }
 
-//std::string generate_uuid(std::string &seed) {
-//  auto sum = std::accumulate(seed.begin(), seed.end(), 0);
-//  std::mt19937 gen(sum);
-//  std::uniform_int_distribution<> dis(0, 15);
-//  std::uniform_int_distribution<> dis2(8, 11);
-//
-//  std::stringstream ss;
-//  ss.clear();
-//  int i;
-//  ss << std::hex;
-//  for (i = 0; i < 8; ++i) ss << dis(gen);
-//  ss << "-";
-//  for (i = 0; i < 4; ++i) ss << dis(gen);
-//  ss << "-4";
-//  for (i = 0; i < 3; ++i) ss << dis(gen);
-//  ss << "-";
-//  ss << dis2(gen);
-//  for (i = 0; i < 12; ++i) ss << dis(gen);
-//  std::cout << "uuid: " << ss.str() << std::endl;
-//  return ss.str();
-//}
-
 pqxx::result util::get_from_sql(const std::string &url, const std::string &s) {
   pqxx::connection CONN(url);
   pqxx::nontransaction conn(CONN);
