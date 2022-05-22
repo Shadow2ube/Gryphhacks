@@ -98,7 +98,8 @@ int main() {
       };
     }
     std::cout << j.dump() << std::endl;
-    res.set_content(j.dump(), "application/json");
+//    res.set_content(j.dump(), "application/json");
+    res.set_content("no", "text/plain");
 //    res.set_content("yeet", "text/plain");
   });
 
@@ -129,7 +130,8 @@ int main() {
       }
       res.set_content(j.dump(), "application/json");
     } catch (std::exception &e) {
-      res.set_content("error: " + std::string(e.what()), "text/plain");
+//      res.set_content("error: " + std::string(e.what()), "text/plain");
+      res.set_content("no", "text/plain");
     }
   });
 
@@ -161,7 +163,8 @@ int main() {
       res.set_header("no", "thank you");
 
     } catch (const std::exception &e) {
-      res.set_content("INVALID EMAIL OR PASSWORD, err: " + std::string(e.what()), "text/plain");
+//      res.set_content("INVALID EMAIL OR PASSWORD, err: " + std::string(e.what()), "text/plain");
+      res.set_content("no", "text/plain");
       return;
     }
   });
@@ -197,7 +200,7 @@ int main() {
          << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
-      res.set_content("invalid: " + std::string(e.what()), "text/plain");
+      res.set_content("no", "text/plain");
       return;
     }
   });
@@ -223,7 +226,8 @@ int main() {
          << (j["is_host"].get<bool>() ? "true" : "false") << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
-      res.set_content("invalid: " + std::string(e.what()), "text/plain");
+//      res.set_content("invalid: " + std::string(e.what()), "text/plain");
+      res.set_content("no", "text/plain");
       return;
     }
   });
