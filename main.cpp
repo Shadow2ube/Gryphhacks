@@ -128,8 +128,8 @@ int main() {
     try {
       json j = req.body;
       std::cout
-          << j["email"].get<std::string>()
-          << '\t' << j["password"].get<std::string>()
+          << j["email"]
+          << '\t' << j["password"]
           << std::endl;
       pqxx::result r = get_from_sql(
           sql_url,
