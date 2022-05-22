@@ -66,6 +66,10 @@ int main() {
 
   // region api requests
 
+  svr.Get("/api/ping", [](const auto &req, auto &res) {
+    res.set_content("pong", "text/plain");
+  });
+
   svr.Get(R"(/api/usr/(\d+))", RES {
     auto id = req.matches[1];
     pqxx::result r = get_from_sql(sql_url, "SELECT id, f_name, l_name, is_host from users where id=" + std::string
@@ -98,27 +102,33 @@ int main() {
   });
 
   svr.Get("/api/events/all", RES {
-    pqxx::result r = get_from_sql(sql_url, "SELECT id, user_id, min_age, is_recurring, name, description, long, "
-                                           "lat, "
-                                           "time_start, time_end, location FROM events");
+    try {
+      pqxx::result r = get_from_sql(
+          sql_url,
+          "SELECT id, user_id, min_age, is_recurring, name, description, long, lat, "
+          "time_start, time_end, location "
+          "FROM events");
 
-    json j = json::array();
-    for (auto row: r) {
-      j += {
-          {"id", row[0].as<int>()},
-          {"user_id", row[1].as<int>()},
-          {"min_age", row[2].as<int>()},
-          {"is_recurring", row[3].as<bool>()},
-          {"name", row[4].as<std::string>()},
-          {"description", row[5].as<std::string>()},
-          {"long", row[6].as<float>()},
-          {"lat", row[7].as<float>()},
-          {"time_start", row[8].as<std::string>()},
-          {"time_end", row[9].as<std::string>()},
-          {"location", row[10].as<std::string>()},
-      };
+      json j = json::array();
+      for (auto row: r) {
+        j += {
+            {"id", row[0].as<std::string>()},
+            {"user_id", row[1].as<std::string>()},
+            {"min_age", row[2].as<std::string>()},
+            {"is_recurring", row[3].as<std::string>()},
+            {"name", row[4].as<std::string>()},
+            {"description", row[5].as<std::string>()},
+            {"long", row[6].as<std::string>()},
+            {"lat", row[7].as<std::string>()},
+            {"time_start", row[8].as<std::string>()},
+            {"time_end", row[9].as<std::string>()},
+            {"location", row[10].as<std::string>()},
+        };
+      }
+      res.set_content(j.dump(), "application/json");
+    } catch (std::exception &e) {
+      res.set_content("error: " + std::string(e.what()), "text/plain");
     }
-    res.set_content(j.dump(), "application/json");
   });
 
   svr.Post("/api/login", [sql_url](
@@ -210,9 +220,8 @@ int main() {
     }
   });
 
-  svr.Options("/api/login", [] (const auto &req, auto &res) {
+  svr.Options("/api/login", [](const auto &req, auto &res) {
     res.set_header("Access-Control-Allow-Origin", "*");
-    res.set_header("Access-Control-Allow-Headers", "Cookie, no");
   });
 
   //endregion
@@ -222,7 +231,7 @@ int main() {
   });
   svr.set_post_routing_handler([](const auto &req, auto &res) {
     res.set_header("Access-Control-Allow-Origin", "*");
-    res.set_header("Access-Control-Allow-Headers", "Cookie, no");
+//    res.set_header("Access-Control-Allow-Headers", "Cookie, no");
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds

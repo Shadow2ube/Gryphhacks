@@ -6,8 +6,8 @@
 #include "picosha2.h"
 
 json util::read_multipart_form(const httplib::Request &req,
-                         httplib::Response &res,
-                         const httplib::ContentReader &content_reader) {
+                               httplib::Response &res,
+                               const httplib::ContentReader &content_reader) {
   httplib::MultipartFormDataItems files;
   content_reader([&](const httplib::MultipartFormData &file) {
     files.push_back(file);
@@ -59,12 +59,14 @@ uint64_t util::gen_snowflake(uint64_t mid) {
 }
 
 pqxx::result util::get_from_sql(const std::string &url, const std::string &s) {
+  std::cout << "sql >> " << s << std::endl;
   pqxx::connection CONN(url);
   pqxx::nontransaction conn(CONN);
   return conn.exec(s);
 }
 
 void util::send_to_sql(const std::string &url, const std::string &s) {
+  std::cout << "sql << " << s << std::endl;
   pqxx::connection CONN(url);
   pqxx::work c(CONN);
   c.exec(s);

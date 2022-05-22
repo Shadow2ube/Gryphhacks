@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="test@free-tier11.gcp-us-east1.cockroachlabs.cloud" uuid="0f1151e6-2c91-4045-b97e-1ada86c274d1">
+      <driver-ref>cockroach</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://free-tier11.gcp-us-east1.cockroachlabs.cloud:26257/test?sslmode=verify-full&amp;options=--cluster%3Dchill-whale-766</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>
