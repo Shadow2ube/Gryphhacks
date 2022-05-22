@@ -130,13 +130,13 @@ int main() {
       pqxx::result r = get_from_sql(
           sql_url,
           "SELECT salt, id, passwd FROM users WHERE email=\'"
-              + remove_of(j["email"]["content"])
+              + remove_of(j["email"])
               + "\'"
       );
       auto id = r[0][1].as<std::string>(),
           passwd_hash = r[0][2].as<std::string>(),
           salt = r[0][0].as<std::string>();
-      if (!valid_pass(passwd_hash, j["password"]["content"].get<std::string>(), salt)) {
+      if (!valid_pass(passwd_hash, j["password"].get<std::string>(), salt)) {
         throw std::exception();
       }
       std::stringstream ss;
