@@ -123,43 +123,38 @@ int main() {
 
   svr.Post("/api/login", [sql_url](
       const httplib::Request &req,
-      httplib::Response &res,
-      const httplib::ContentReader &content_reader
+      httplib::Response &res
   ) {
-    if (req.is_multipart_form_data()) {
-      json j = read_multipart_form(req, res, content_reader);
-      try {
-        pqxx::result r = get_from_sql(
-            sql_url,
-            "SELECT salt, id, passwd FROM users WHERE email=\'"
-                + remove_of(j["email"]["content"])
-                + "\'"
-        );
-        auto id = r[0][1].as<std::string>(),
-            passwd_hash = r[0][2].as<std::string>(),
-            salt = r[0][0].as<std::string>();
-        if (!valid_pass(passwd_hash, j["password"]["content"].get<std::string>(), salt)) {
-          throw std::exception();
-        }
-        std::stringstream ss;
-        std::cout << "a" << std::endl;
-        ss << "INSERT INTO sessions (user_id) VALUES (" << id << ");";
-        std::cout << "b" << std::endl;
-        send_to_sql(sql_url, ss.str());
-        std::cout << "c" << std::endl;
-        std::cout << "d" << std::endl;
-        res.set_header("Cookie",
-                       "session="
-                           + get_from_sql(sql_url,
-                                          "SELECT uuid FROM sessions WHERE user_id=" + id)[0][0].as<std::string>()
-        );
-        std::cout << "e" << std::endl;
-      } catch (const std::exception &e) {
-        res.set_content("INVALID EMAIL OR PASSWORD, err: " + std::string(e.what()), "text/plain");
-        return;
+    try {
+      json j = req.body;
+      pqxx::result r = get_from_sql(
+          sql_url,
+          "SELECT salt, id, passwd FROM users WHERE email=\'"
+              + remove_of(j["email"]["content"])
+              + "\'"
+      );
+      auto id = r[0][1].as<std::string>(),
+          passwd_hash = r[0][2].as<std::string>(),
+          salt = r[0][0].as<std::string>();
+      if (!valid_pass(passwd_hash, j["password"]["content"].get<std::string>(), salt)) {
+        throw std::exception();
       }
-    } else {
-      res.set_content("INVALID FORM INPUT", "text/plain");
+      std::stringstream ss;
+      std::cout << "a" << std::endl;
+      ss << "INSERT INTO sessions (user_id) VALUES (" << id << ");";
+      std::cout << "b" << std::endl;
+      send_to_sql(sql_url, ss.str());
+      std::cout << "c" << std::endl;
+      std::cout << "d" << std::endl;
+      res.set_header("Cookie",
+                     "session="
+                         + get_from_sql(sql_url,
+                                        "SELECT uuid FROM sessions WHERE user_id=" + id)[0][0].as<std::string>()
+      );
+      std::cout << "e" << std::endl;
+    } catch (const std::exception &e) {
+      res.set_content("INVALID EMAIL OR PASSWORD, err: " + std::string(e.what()), "text/plain");
+      return;
     }
   });
 
