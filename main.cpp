@@ -76,7 +76,7 @@ int main() {
         (id));
 
     json j = {
-        {"id", r[0][0].as<int>()},
+        {"id", r[0][0].as<uint64_t>()},
         {"f_name", r[0][1].as<std::string>()},
         {"l_name", r[0][2].as<std::string>()},
         {"is_host", r[0][3].as<bool>()},
@@ -90,11 +90,11 @@ int main() {
     json j = json::array();
     for (auto row: r) {
       j += {
-          {"id", row[0].as<int>()},
+          {"id", row[0].as<std::string>()},
           {"name", row[1].as<std::string>()},
           {"location", row[2].as<std::string>()},
-          {"lat", row[3].as<float>()},
-          {"long", row[4].as<float>()},
+          {"lat", row[3].as<std::string>()},
+          {"long", row[4].as<std::string>()},
       };
     }
     res.set_content(j.dump(), "application/json");
