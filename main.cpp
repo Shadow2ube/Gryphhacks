@@ -97,7 +97,6 @@ int main() {
           {"long", row[4].as<std::string>()},
       };
     }
-    std::cout << j.dump() << std::endl;
 //    res.set_content(j.dump(), "application/json");
     res.set_content("no", "text/plain");
 //    res.set_content("yeet", "text/plain");
@@ -178,7 +177,6 @@ int main() {
 //      res.set_content("Unauthorized", "text/plain");
 //      return;
 //    }
-    std::cout << "aa: " << req.body << std::endl;
     json j = json::parse(req.body);
     try {
       std::stringstream ss;
@@ -210,7 +208,6 @@ int main() {
       httplib::Response &res
   ) {
     try {
-      std::cout << req.body << std::endl;
       json j = json::parse(req.body);
       // validate email with twilio
       uint64_t salt = gen_snowflake(1234) >> 1;
