@@ -192,7 +192,7 @@ int main() {
          << j["time_end"].get<std::string>() << "','"
          << j["location"].get<std::string>() << "', '"
          << j["email"].get<std::string>() << "', "
-         << j["is_recurring"].get<std::string>()
+         << (j["is_recurring"].get<bool>() ? "true" : "false")
          << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
