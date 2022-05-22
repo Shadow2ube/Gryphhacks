@@ -58,11 +58,11 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
   return perm_level::USER;
 }
 
-int main() {
+int main(int argc, char **) {
   std::string sql_url = parse_url();
   get_local_ip();
 
-  SSLServer svr("./cert.pem", "./key.pem");
+  Server svr; //("./cert.pem", "./key.pem");
 
   // region api requests
 
