@@ -181,9 +181,9 @@ int main() {
       std::stringstream ss;
       ss << "INSERT INTO events (id, user_id, min_age, name, description, lat, long, time_start, time_end, "
             "location, email, is_recurring) VALUES ("
-            << (gen_snowflake(10) >> 1) << ","
+         << (gen_snowflake(10) >> 1) << ","
          // << uid_from_session(sql_url, req.get_header_value("auth")) << ","
-         << gen_snowflake(6464) << ","
+         << (gen_snowflake(6464) >> 1) << ","
          << j["min_age"].get<int>() << ",'"
          << j["name"].get<std::string>() << "','"
          << j["description"].get<std::string>() << "',"
