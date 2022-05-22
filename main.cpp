@@ -1,4 +1,4 @@
-#define CPPHTTPLIB_OPENSSL_SUPPORT
+//#define CPPHTTPLIB_OPENSSL_SUPPORT
 
 #include <iostream>
 #include <string>
@@ -61,8 +61,7 @@ int main() {
   std::string sql_url = parse_url();
   get_local_ip();
 
-  Server svr;  //("./ignore/cert.pem", "./ignore/key.pem");
-  gen_snowflake(22);
+  Server svr;
 
   // region api requests
 
@@ -129,7 +128,6 @@ int main() {
       }
       res.set_content(j.dump(), "application/json");
     } catch (std::exception &e) {
-//      res.set_content("error: " + std::string(e.what()), "text/plain");
       res.set_content("no", "text/plain");
     }
   });
@@ -162,7 +160,6 @@ int main() {
       res.set_header("no", "thank you");
 
     } catch (const std::exception &e) {
-//      res.set_content("INVALID EMAIL OR PASSWORD, err: " + std::string(e.what()), "text/plain");
       res.set_content("no", "text/plain");
       return;
     }
@@ -172,11 +169,6 @@ int main() {
       const httplib::Request &req,
       httplib::Response &res
   ) {
-    // WOO no perms lol
-//    if (get_perms(sql_url, req.get_header_value("Cookie").substr(5)) <= 1) {
-//      res.set_content("Unauthorized", "text/plain");
-//      return;
-//    }
     json j = json::parse(req.body);
     try {
       std::stringstream ss;
@@ -223,7 +215,6 @@ int main() {
          << (j["is_host"].get<bool>() ? "true" : "false") << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
-//      res.set_content("invalid: " + std::string(e.what()), "text/plain");
       res.set_content("no", "text/plain");
       return;
     }
@@ -240,7 +231,6 @@ int main() {
   });
   svr.set_post_routing_handler([](const auto &req, auto &res) {
     res.set_header("Access-Control-Allow-Origin", "*");
-//    res.set_header("Access-Control-Allow-Headers", "Cookie, no");
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds
