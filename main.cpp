@@ -127,6 +127,10 @@ int main() {
   ) {
     try {
       json j = req.body;
+      std::cout
+          << j["email"].get<std::string>()
+          << '\t' << j["password"].get<std::string>()
+          << std::endl;
       pqxx::result r = get_from_sql(
           sql_url,
           "SELECT salt, id, passwd FROM users WHERE email=\'"
