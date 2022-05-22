@@ -22,6 +22,7 @@
  */
 
 using httplib::Server;
+using httplib::SSLServer;
 using nlohmann::json;
 using namespace std::chrono;
 using namespace util;
@@ -61,8 +62,7 @@ int main() {
   std::string sql_url = parse_url();
   get_local_ip();
 
-  Server svr;  //("./ignore/cert.pem", "./ignore/key.pem");
-  gen_snowflake(22);
+  SSLServer svr("./cert.pem", "./key.pem");
 
   // region api requests
 
@@ -97,8 +97,8 @@ int main() {
           {"long", row[4].as<std::string>()},
       };
     }
-//    res.set_content(j.dump(), "application/json");
-    res.set_content("no", "text/plain");
+    res.set_content(j.dump(), "application/json");
+//    res.set_content("no", "text/plain");
 //    res.set_content("yeet", "text/plain");
   });
 
@@ -127,9 +127,11 @@ int main() {
             {"email", row[10].as<std::string>()},
         };
       }
+      std::cout << "c" << std::endl;
       res.set_content(j.dump(), "application/json");
+      std::cout << "d" << std::endl;
     } catch (std::exception &e) {
-//      res.set_content("error: " + std::string(e.what()), "text/plain");
+      std::cout << e.what() << std::endl;
       res.set_content("no", "text/plain");
     }
   });
@@ -162,7 +164,7 @@ int main() {
       res.set_header("no", "thank you");
 
     } catch (const std::exception &e) {
-//      res.set_content("INVALID EMAIL OR PASSWORD, err: " + std::string(e.what()), "text/plain");
+      std::cout << e.what() << std::endl;
       res.set_content("no", "text/plain");
       return;
     }
@@ -198,6 +200,7 @@ int main() {
          << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
+      std::cout << e.what() << std::endl;
       res.set_content("no", "text/plain");
       return;
     }
@@ -223,7 +226,7 @@ int main() {
          << (j["is_host"].get<bool>() ? "true" : "false") << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
-//      res.set_content("invalid: " + std::string(e.what()), "text/plain");
+      std::cout << e.what() << std::endl;
       res.set_content("no", "text/plain");
       return;
     }
