@@ -210,9 +210,9 @@ int main() {
     }
   });
 
-  svr.Options(R"(/api/login)", [] (const auto &req, auto &res) {
+  svr.Options("/api/login", [] (const auto &req, auto &res) {
     res.set_header("Access-Control-Allow-Origin", "*");
-    res.set_header("Access-Control-Allow-Headers", "Cookie");
+    res.set_header("Access-Control-Allow-Headers", "Cookie, no");
   });
 
   //endregion
