@@ -123,7 +123,7 @@ int main() {
             {"time_start", row[8].as<std::string>()},
             {"time_end", row[9].as<std::string>()},
             {"location", row[10].as<std::string>()},
-            {"email", row[10].as<std::string>()},
+            {"email", row[11].as<std::string>()},
         };
       }
       res.set_content(j.dump(), "application/json");
@@ -220,8 +220,11 @@ int main() {
     }
   });
 
-  svr.Options("/api/login", [](const auto &req, auto &res) {
-    res.set_header("Access-Control-Allow-Origin", "*");
+  svr.Options(R"(\*)", [](const auto& req, auto& res) {
+    res.set_header("Access-Control-Allow-Origin", req.get_header_value("Origin").c_str());
+    res.set_header("Allow", "GET, POST, HEAD, OPTIONS");
+    res.set_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Accept, Origin, Authorization");
+    res.set_header("Access-Control-Allow-Methods", "OPTIONS, GET, POST, HEAD");
   });
 
   //endregion
