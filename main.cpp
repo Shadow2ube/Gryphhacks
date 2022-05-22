@@ -107,7 +107,7 @@ int main() {
       pqxx::result r = get_from_sql(
           sql_url,
           "SELECT id, user_id, min_age, is_recurring, name, description, long, lat, "
-          "time_start, time_end, location "
+          "time_start, time_end, location, email "
           "FROM events");
 
       json j = json::array();
@@ -124,6 +124,7 @@ int main() {
             {"time_start", row[8].as<std::string>()},
             {"time_end", row[9].as<std::string>()},
             {"location", row[10].as<std::string>()},
+            {"email", row[10].as<std::string>()},
         };
       }
       res.set_content(j.dump(), "application/json");
@@ -178,7 +179,7 @@ int main() {
     try {
       std::stringstream ss;
       ss << "INSERT INTO events (id, user_id, min_age, name, description, lat, long, time_start, time_end, "
-            "location) VALUES (" << (gen_snowflake(10) >> 1) << ","
+            "location, email) VALUES (" << (gen_snowflake(10) >> 1) << ","
         // << uid_from_session(sql_url, req.get_header_value("auth")) << ","
          << gen_snowflake(6464) << ","
          << std::stoi(j["min_age"].get<std::string>()) << ",'"
@@ -188,7 +189,8 @@ int main() {
          << std::stof(j["long"].get<std::string>()) << ", TIMESTAMP '"
          << j["time_start"].get<std::string>() << "', TIMESTAMP '"
          << j["time_end"].get<std::string>() << "','"
-         << j["location"].get<std::string>() << "')";
+         << j["location"].get<std::string>() <<  "''"
+         << j["email"] << "')";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
       res.set_content("invalid: " + std::string(e.what()), "text/plain");
