@@ -127,11 +127,11 @@ int main() {
   ) {
     try {
       json j = req.body;
-      std::cout << j.dump() << std::endl;
+//      std::cout << j.dump() << std::endl;
       pqxx::result r = get_from_sql(
           sql_url,
           "SELECT salt, id, passwd FROM users WHERE email=\'"
-              + remove_of(j["email"])
+              + j["email"].get<std::string>()
               + "\'"
       );
       auto id = r[0][1].as<std::string>(),
