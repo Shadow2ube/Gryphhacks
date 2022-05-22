@@ -4,8 +4,6 @@
 #include <string>
 #include <pqxx/pqxx>
 #include <cstdio>
-#include <yaml-cpp/yaml.h>
-#include <yaml.h>
 #include "httplib.h"
 #include "json.hpp"
 #include "util.h"
