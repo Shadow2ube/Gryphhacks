@@ -126,8 +126,7 @@ int main() {
       httplib::Response &res
   ) {
     try {
-      json j = req.body;
-      std::cout << j.dump(2) << std::endl;
+      json j = json::parse(req.body);
       pqxx::result r = get_from_sql(
           sql_url,
           "SELECT salt, id, passwd FROM users WHERE email=\'"
