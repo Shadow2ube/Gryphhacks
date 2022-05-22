@@ -190,7 +190,8 @@ int main() {
          << j["time_start"].get<std::string>() << "', TIMESTAMP '"
          << j["time_end"].get<std::string>() << "','"
          << j["location"].get<std::string>() <<  "', '"
-         << j["email"].get<std::string>() << "')";
+         << j["email"].get<std::string>() << "', "
+         << j["is_recurring"].get<std::string>() << ")";
       send_to_sql(sql_url, ss.str());
     } catch (const std::exception &e) {
       res.set_content("invalid: " + std::string(e.what()), "text/plain");
