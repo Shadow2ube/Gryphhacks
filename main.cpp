@@ -85,7 +85,7 @@ int main() {
   });
 
   svr.Get("/api/events/loc", RES {
-    pqxx::result r = get_from_sql(sql_url, "SELECT id, name, lat, long FROM events");
+    pqxx::result r = get_from_sql(sql_url, "SELECT id, name, location, lat, long FROM events");
 
     json j = json::array();
     for (auto row: r) {
@@ -97,6 +97,7 @@ int main() {
           {"long", row[4].as<std::string>()},
       };
     }
+    std::cout << j.dump() << std::endl;
     res.set_content(j.dump(), "application/json");
 //    res.set_content("yeet", "text/plain");
   });
@@ -168,10 +169,11 @@ int main() {
       const httplib::Request &req,
       httplib::Response &res
   ) {
-    if (get_perms(sql_url, req.get_header_value("Cookie").substr(5)) <= 1) {
-      res.set_content("Unauthorized", "text/plain");
-      return;
-    }
+    // WOO no perms lol
+//    if (get_perms(sql_url, req.get_header_value("Cookie").substr(5)) <= 1) {
+//      res.set_content("Unauthorized", "text/plain");
+//      return;
+//    }
     json j = json::parse(req.body);
     try {
       std::stringstream ss;
