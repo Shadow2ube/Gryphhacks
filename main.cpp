@@ -140,18 +140,14 @@ int main() {
         throw std::exception();
       }
       std::stringstream ss;
-      std::cout << "a" << std::endl;
       ss << "INSERT INTO sessions (user_id) VALUES (" << id << ");";
-      std::cout << "b" << std::endl;
       send_to_sql(sql_url, ss.str());
-      std::cout << "c" << std::endl;
-      std::cout << "d" << std::endl;
       res.set_header("Cookie",
-                     "session="
-                         + get_from_sql(sql_url,
-                                        "SELECT uuid FROM sessions WHERE user_id=" + id)[0][0].as<std::string>()
-      );
-      std::cout << "e" << std::endl;
+                     "session=" + get_from_sql(
+                         sql_url, "SELECT uuid FROM sessions WHERE user_id="
+                             + id)[0][0].as<std::string>());
+      res.set_header("no", "thank you");
+
     } catch (const std::exception &e) {
       res.set_content("INVALID EMAIL OR PASSWORD, err: " + std::string(e.what()), "text/plain");
       return;
