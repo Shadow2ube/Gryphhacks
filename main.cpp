@@ -183,7 +183,7 @@ int main() {
             "location, email) VALUES (" << (gen_snowflake(10) >> 1) << ","
          // << uid_from_session(sql_url, req.get_header_value("auth")) << ","
          << gen_snowflake(6464) << ","
-         << j["min_age"].get<std::string>() << ",'"
+         << j["min_age"].get<int>() << ",'"
          << j["name"].get<std::string>() << "','"
          << j["description"].get<std::string>() << "',"
          << j["lat"].get<float>() << ","
