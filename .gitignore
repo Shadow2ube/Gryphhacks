@@ -3,4 +3,4 @@
 
 /ignore/
 unsafe.yml
-/.ccls-cache/
+.ccls-cache
