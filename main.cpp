@@ -175,12 +175,13 @@ int main() {
 //      res.set_content("Unauthorized", "text/plain");
 //      return;
 //    }
+    std::cout << "aa: " << req.body << std::endl;
     json j = json::parse(req.body);
     try {
       std::stringstream ss;
       ss << "INSERT INTO events (id, user_id, min_age, name, description, lat, long, time_start, time_end, "
             "location, email) VALUES (" << (gen_snowflake(10) >> 1) << ","
-        // << uid_from_session(sql_url, req.get_header_value("auth")) << ","
+         // << uid_from_session(sql_url, req.get_header_value("auth")) << ","
          << gen_snowflake(6464) << ","
          << std::stoi(j["min_age"].get<std::string>()) << ",'"
          << j["name"].get<std::string>() << "','"
@@ -189,7 +190,7 @@ int main() {
          << std::stof(j["long"].get<std::string>()) << ", TIMESTAMP '"
          << j["time_start"].get<std::string>() << "', TIMESTAMP '"
          << j["time_end"].get<std::string>() << "','"
-         << j["location"].get<std::string>() <<  "', '"
+         << j["location"].get<std::string>() << "', '"
          << j["email"].get<std::string>() << "', "
          << j["is_recurring"].get<std::string>() << ")";
       send_to_sql(sql_url, ss.str());
