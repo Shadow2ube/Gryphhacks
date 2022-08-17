@@ -56,7 +56,11 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
   return perm_level::USER;
 }
 
-int main() {
+int main(int argc, char**argv) {
+  auto ip = get_local_ip();
+  if (argc > 1) {
+    ip = argv[1];
+  }
   std::string sql_url = parse_url();
   get_local_ip();
 
@@ -233,7 +237,6 @@ int main() {
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds
-  auto ip = get_local_ip();
   std::cout << "IP: " << ip << std::endl;
   svr.listen(ip, 8080);
   return 0;
