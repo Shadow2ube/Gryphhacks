@@ -233,7 +233,9 @@ int main() {
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds
-  svr.listen(get_local_ip(), 8080);
+  auto ip = get_local_ip();
+  std::cout << "IP: " << ip << std::endl;
+  svr.listen(ip, 8080);
   return 0;
 }
 
