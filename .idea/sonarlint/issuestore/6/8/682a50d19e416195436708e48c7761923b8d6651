@@ -1,0 +1,27 @@
+
+I	cpp:S1135"4Complete the task associated to this "TODO" comment.(–±Ù
+>	cpp:S14816"$unused exception parameter 'ignored'(§«ˆ¤ıÿÿÿÿ
+2cpp:S125c"Remove the commented out code.(şµ•á
+4	cpp:S1481‚"unused exception parameter 'e'(ÜÙÑ«
+4	cpp:S1481¢"unused exception parameter 'e'(¿Î†Ş
+2cpp:S125e"Remove the commented out code.(İš­¹
+4	cpp:S1481À"unused exception parameter 'e'(¿Î†Ş
+4	cpp:S1481Ù"unused exception parameter 'e'(¿Î†Ş
+@	cpp:S3642&"&Replace this "enum" with "enum class".(œò¾›şÿÿÿÿ
+S	cpp:S11816"9Catch a more specific exception instead of a generic one.(§«ˆ¤ıÿÿÿÿ
+D	cpp:S16593"0Define each identifier in a dedicated statement.(¡ï”s
+‰	cpp:S53506"oMake the type of this variable a reference-to-const. The current type of "ignored" is "class std::exception &".(§«ˆ¤ıÿÿÿÿ
+o	cpp:S1172D"URemove the unused parameter "req", make it unnamed, or declare it "[[maybe_unused]]".(¹ú„Íûÿÿÿÿ
+O	cpp:S1181‚"9Catch a more specific exception instead of a generic one.(ÜÙÑ«
+	cpp:S5350‚"iMake the type of this variable a reference-to-const. The current type of "e" is "class std::exception &".(ÜÙÑ«
+k	cpp:S1188‡"VReduce this lambda number of lines from 31 to at most 20, or make it a named function.(’ãîZ
+O	cpp:S1181¢"9Catch a more specific exception instead of a generic one.(¿Î†Ş
+K	cpp:S1659“"0Define each identifier in a dedicated statement.(½Õ”Ìøÿÿÿÿ
+`cpp:S112—"FDefine and throw a dedicated exception instead of using a generic one.(ë½èƒùÿÿÿÿ
+q	cpp:S1188¨"VReduce this lambda number of lines from 28 to at most 20, or make it a named function.(¶¨ÿ™ıÿÿÿÿ
+O	cpp:S1181À"9Catch a more specific exception instead of a generic one.(¿Î†Ş
+l	cpp:S1188Æ"VReduce this lambda number of lines from 23 to at most 20, or make it a named function.(‡Ì¼
+O	cpp:S1181Ù"9Catch a more specific exception instead of a generic one.(¿Î†Ş
+p	cpp:S1172ß"URemove the unused parameter "req", make it unnamed, or declare it "[[maybe_unused]]".(ñ«Åœÿÿÿÿÿ
+p	cpp:S1172è"URemove the unused parameter "req", make it unnamed, or declare it "[[maybe_unused]]".(ï¢Êùÿÿÿÿ
+\	cpp:S6009ñ"FReplace this const reference to "std::string" by a "std::string_view".(­Ñ£Ó

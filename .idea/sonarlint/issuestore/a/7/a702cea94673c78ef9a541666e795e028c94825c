@@ -1,0 +1,30 @@
+
+M	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(®í¢
+3cpp:S125¤"Remove the commented out code.(¤¼Ş…
+3cpp:S125¯"Remove the commented out code.(¤¼Ş…
+M	cpp:S5028"8Replace this macro by "const", "constexpr" or an "enum".(®í¢
+3cpp:S125¤"Remove the commented out code.(¤¼Ş…
+3cpp:S125¯"Remove the commented out code.(¤¼Ş…
+P	cpp:S5416(";"using" should be preferred to "typedef" for type aliasing.(ø’úÅ
+P	cpp:S5416)";"using" should be preferred to "typedef" for type aliasing.(÷Ù“­
+N	cpp:S6022."4Use "std::byte" for byte-oriented data manipulation.(ÑÃæáüÿÿÿÿ
+W	cpp:S59452"=Use "std::array" or "std::vector" instead of a C-style array.(í…ü–úÿÿÿÿ
+R	cpp:S5945?"=Use "std::array" or "std::vector" instead of a C-style array.(é±Çä
+W	cpp:S5945_"=Use "std::array" or "std::vector" instead of a C-style array.(·Ç›îûÿÿÿÿ
+u	cpp:S6024£"`Prefer free functions over member functions when handling objects of generic type "InContainer".(µÂÉ=
+H	cpp:S5945Î"2Use "std::string" instead of a C-style char array.(ñš—ó
+Gcpp:S886ã"2Refactor this loop so that it is less error-prone.(•‰¤§
+Y	cpp:S5566î"CChange this raw for-loop to a range for-loop or an "std::for_each".(ûùµë
+Y	cpp:S5566ÿ"CChange this raw for-loop to a range for-loop or an "std::for_each".(ûùµë
+X	cpp:S5945ù"=Use "std::array" or "std::vector" instead of a C-style array.(Ş·­ˆüÿÿÿÿ
+S	cpp:S5945"=Use "std::array" or "std::vector" instead of a C-style array.(á¨ÖŠ
+X	cpp:S5945"=Use "std::array" or "std::vector" instead of a C-style array.(ªÇ«Ãüÿÿÿÿ
+M	cpp:S5945”"2Use "std::string" instead of a C-style char array.(èÎÓşÿÿÿÿ
+|	cpp:S6024È"aPrefer free functions over member functions when handling objects of generic type "OutContainer".(‘­›Òşÿÿÿÿ
+{	cpp:S6024Í"`Prefer free functions over member functions when handling objects of generic type "InContainer".(’›©‚üÿÿÿÿ
+{	cpp:S6024Ò"`Prefer free functions over member functions when handling objects of generic type "InContainer".(ÃâŸ°ûÿÿÿÿ
+|	cpp:S6024Ò"aPrefer free functions over member functions when handling objects of generic type "OutContainer".(ÃâŸ°ûÿÿÿÿ
+H	cpp:S5945Ù"2Use "std::string" instead of a C-style char array.(°»ù
+a	cpp:S6009ç"FReplace this const reference to "std::string" by a "std::string_view".(€ñ»üıÿÿÿÿ
+u	cpp:S6024ë"`Prefer free functions over member functions when handling objects of generic type "InContainer".(µÂÉ=
+u	cpp:S6024ğ"`Prefer free functions over member functions when handling objects of generic type "InContainer".(µÂÉ=

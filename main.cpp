@@ -156,7 +156,7 @@ int main(int argc, char**argv) {
       std::stringstream ss;
       ss << "INSERT INTO sessions (user_id) VALUES (" << id << ");";
       send_to_sql(sql_url, ss.str());
-      res.set_header("Cookie",
+      res.set_header("Set-Cookie",
                      "session=" + get_from_sql(
                          sql_url, "SELECT uuid FROM sessions WHERE user_id="
                              + id)[0][0].as<std::string>());
