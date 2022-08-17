@@ -27,7 +27,7 @@ using namespace util;
 
 std::string parse_url() {
   std::ifstream in;
-  in.open("./settings.no");
+  in.open("/etc/sevahub/settings.no");
   std::string line;
   getline(in, line);
   return line;
