@@ -50,7 +50,7 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
     bool is_admin = r[0][0].as<bool>(), is_host = r[0][1].as<bool>();
     if (is_admin) return perm_level::ADMIN;
     if (is_host) return perm_level::HOST;
-  } catch (std::exception const &ignored) {
+  } catch (std::exception &ignored) {
     return perm_level::NO_AUTH;
   }
   return perm_level::USER;
@@ -219,11 +219,8 @@ int main() {
     }
   });
 
-  svr.Options(R"(\*)", [](const auto& req, auto& res) {
-    res.set_header("Access-Control-Allow-Origin", req.get_header_value("Origin").c_str());
-    res.set_header("Allow", "GET, POST, HEAD, OPTIONS");
-    res.set_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Accept, Origin, Authorization");
-    res.set_header("Access-Control-Allow-Methods", "OPTIONS, GET, POST, HEAD");
+  svr.Options("/api/login", [](const auto &req, auto &res) {
+    res.set_header("Access-Control-Allow-Origin", "*");
   });
 
   //endregion
@@ -243,5 +240,3 @@ int main() {
 bool valid_pass(const std::string &hash, const std::string &passwd, const std::string &salt) {
   return hash == sha256(passwd + salt);
 }
-
-
