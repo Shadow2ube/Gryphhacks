@@ -3,7 +3,7 @@
 //
 
 #include "util.h"
-#include "picosha2.h"
+#include "lib/picosha2.h"
 
 json util::read_multipart_form(const httplib::Request &req,
                                httplib::Response &res,

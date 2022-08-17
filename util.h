@@ -12,8 +12,8 @@
 #include <string>
 #include <pqxx/pqxx>
 
-#include "httplib.h"
-#include "json.hpp"
+#include "lib/httplib.h"
+#include "lib/json.hpp"
 
 using httplib::Server;
 using nlohmann::json;

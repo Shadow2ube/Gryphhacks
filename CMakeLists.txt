@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.23)
 project(Gryphhacks)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -8,7 +8,7 @@ find_package(OpenSSL REQUIRED)
 #find_package()
 
 add_executable(Gryphhacks
-        httplib.h json.hpp picosha2.h
+        lib/httplib.h lib/json.hpp lib/picosha2.h
         main.cpp
         util.h util.cpp)
 

@@ -4,10 +4,10 @@
 #include <string>
 #include <pqxx/pqxx>
 #include <cstdio>
-#include "httplib.h"
-#include "json.hpp"
+#include "lib/httplib.h"
+#include "lib/json.hpp"
 #include "util.h"
-#include "picosha2.h"
+#include "lib/picosha2.h"
 
 #define RES [&](const httplib::Request &req, httplib::Response &res)
 #define REQ [&](const httplib::Request &req, httplib::Response &)
@@ -17,7 +17,6 @@
  * POST REQUESTS:
  * update_profile
  * update_event
- * user_create
  * org_create
  */
 
@@ -51,7 +50,7 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
     bool is_admin = r[0][0].as<bool>(), is_host = r[0][1].as<bool>();
     if (is_admin) return perm_level::ADMIN;
     if (is_host) return perm_level::HOST;
-  } catch (std::exception &ignored) {
+  } catch (std::exception const &ignored) {
     return perm_level::NO_AUTH;
   }
   return perm_level::USER;
