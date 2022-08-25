@@ -58,14 +58,14 @@ uint64_t util::gen_snowflake(uint64_t mid) {
   return out;
 }
 
-pqxx::result util::get_from_sql(const std::string &url, const std::string &s) {
+pqxx::result util::get_from_sql(const std::string &s, const std::string &url) {
   std::cout << "sql >> " << s << std::endl;
   pqxx::connection CONN(url);
   pqxx::nontransaction conn(CONN);
   return conn.exec(s);
 }
 
-void util::send_to_sql(const std::string &url, const std::string &s) {
+void util::send_to_sql(const std::string &s, const std::string &url) {
   std::cout << "sql << " << s << std::endl;
   pqxx::connection CONN(url);
   pqxx::work c(CONN);

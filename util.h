@@ -14,6 +14,7 @@
 
 #include "lib/httplib.h"
 #include "lib/json.hpp"
+#include "settings.h"
 
 using httplib::Server;
 using nlohmann::json;
@@ -24,11 +25,11 @@ char *get_local_ip();
 
 uint64_t gen_snowflake(uint64_t mid);
 
-uint64_t uid_from_session(const std::string &url, const std::string &uuid);
+uint64_t uid_from_session(const std::string &uuid, const std::string &url = settings::sql_url);
 
-pqxx::result get_from_sql(const std::string &url, const std::string &s);
+pqxx::result get_from_sql( const std::string &s,const std::string &url = settings::sql_url);
 
-void send_to_sql(const std::string &url, const std::string &s);
+void send_to_sql(const std::string &s, const std::string &url=settings::sql_url);
 
 std::string make_safe(std::string in);
 

@@ -8,6 +8,9 @@
 #include "lib/json.hpp"
 #include "util.h"
 #include "lib/picosha2.h"
+#include "endpoints/misc.h"
+#include "endpoints/user.h"
+#include "settings.h"
 
 #define RES [&](const httplib::Request &req, httplib::Response &res)
 #define REQ [&](const httplib::Request &req, httplib::Response &)
@@ -56,12 +59,12 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
   return perm_level::USER;
 }
 
-int main(int argc, char**argv) {
+int main(int argc, char **argv) {
   auto ip = get_local_ip();
   if (argc > 1) {
     ip = argv[1];
   }
-  std::string sql_url = parse_url();
+  settings::sql_url = parse_url();
   get_local_ip();
 
   Server svr;
@@ -73,9 +76,10 @@ int main(int argc, char**argv) {
   });
 
   svr.Get(R"(/api/usr/(\d+))", RES {
-    auto id = req.matches[1];
-    pqxx::result r = get_from_sql(sql_url, "SELECT id, f_name, l_name, is_host from users where id=" + std::string
-        (id));
+    std::string id = req.matches[1];
+    pqxx::result r = get_from_sql(
+        settings::sql_url,
+        "SELECT id, f_name, l_name, is_host from users where id=" + id);
 
     json j = {
         {"id", r[0][0].as<uint64_t>()},
@@ -87,7 +91,7 @@ int main(int argc, char**argv) {
   });
 
   svr.Get("/api/events/loc", RES {
-    pqxx::result r = get_from_sql(sql_url, "SELECT id, name, location, lat, long FROM events");
+    pqxx::result r = get_from_sql(settings::sql_url, "SELECT id, name, location, lat, long FROM events");
 
     json j = json::array();
     for (auto row: r) {
@@ -107,7 +111,7 @@ int main(int argc, char**argv) {
   svr.Get("/api/events/all", RES {
     try {
       pqxx::result r = get_from_sql(
-          sql_url,
+          settings::sql_url,
           "SELECT id, user_id, min_age, is_recurring, name, description, long, lat, "
           "time_start, time_end, location, email "
           "FROM events");
@@ -135,14 +139,13 @@ int main(int argc, char**argv) {
     }
   });
 
-  svr.Post("/api/login", [sql_url](
+  svr.Post("/api/login", [](
       const httplib::Request &req,
       httplib::Response &res
   ) {
     try {
       json j = json::parse(req.body);
       pqxx::result r = get_from_sql(
-          sql_url,
           "SELECT salt, id, passwd FROM users WHERE email=\'"
               + j["email"].get<std::string>()
               + "\'"
@@ -155,11 +158,9 @@ int main(int argc, char**argv) {
       }
       std::stringstream ss;
       ss << "INSERT INTO sessions (user_id) VALUES (" << id << ");";
-      send_to_sql(sql_url, ss.str());
+      send_to_sql( ss.str());
       res.set_header("Set-Cookie",
-                     "session=" + get_from_sql(
-                         sql_url, "SELECT uuid FROM sessions WHERE user_id="
-                             + id)[0][0].as<std::string>());
+                     "session=" + get_from_sql("SELECT uuid FROM sessions WHERE user_id=" + id)[0][0].as<std::string>());
       res.set_header("no", "thank you");
 
     } catch (const std::exception &e) {
@@ -168,7 +169,7 @@ int main(int argc, char**argv) {
     }
   });
 
-  svr.Post("/api/events/create", [sql_url](
+  svr.Post("/api/events/create", [](
       const httplib::Request &req,
       httplib::Response &res
   ) {
@@ -191,14 +192,14 @@ int main(int argc, char**argv) {
          << j["email"].get<std::string>() << "', "
          << (j["is_recurring"].get<bool>() ? "true" : "false")
          << ")";
-      send_to_sql(sql_url, ss.str());
+      send_to_sql(ss.str());
     } catch (const std::exception &e) {
       res.set_content("no", "text/plain");
       return;
     }
   });
 
-  svr.Post("/api/signup", [sql_url](
+  svr.Post("/api/signup", [](
       const httplib::Request &req,
       httplib::Response &res
   ) {
@@ -216,7 +217,7 @@ int main(int argc, char**argv) {
          << sha256(j["password"].get<std::string>() + std::to_string(salt)) << "',"
          << salt << ","
          << (j["is_host"].get<bool>() ? "true" : "false") << ")";
-      send_to_sql(sql_url, ss.str());
+      send_to_sql(ss.str());
     } catch (const std::exception &e) {
       res.set_content("no", "text/plain");
       return;

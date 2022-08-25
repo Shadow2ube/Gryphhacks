@@ -10,6 +10,6 @@ find_package(OpenSSL REQUIRED)
 add_executable(Gryphhacks
         lib/httplib.h lib/json.hpp lib/picosha2.h
         main.cpp
-        util.h util.cpp)
+        util.h util.cpp endpoints/misc.h endpoints/user.h settings.h)
 
 target_link_libraries(Gryphhacks OpenSSL::SSL)
