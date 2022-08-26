@@ -78,7 +78,6 @@ int main(int argc, char **argv) {
   svr.Get(R"(/api/usr/(\d+))", RES {
     std::string id = req.matches[1];
     pqxx::result r = get_from_sql(
-        settings::sql_url,
         "SELECT id, f_name, l_name, is_host from users where id=" + id);
 
     json j = {
@@ -91,7 +90,7 @@ int main(int argc, char **argv) {
   });
 
   svr.Get("/api/events/loc", RES {
-    pqxx::result r = get_from_sql(settings::sql_url, "SELECT id, name, location, lat, long FROM events");
+    pqxx::result r = get_from_sql("SELECT id, name, location, lat, long FROM events");
 
     json j = json::array();
     for (auto row: r) {
@@ -103,15 +102,14 @@ int main(int argc, char **argv) {
           {"long", row[4].as<std::string>()},
       };
     }
-//    res.set_content(j.dump(), "application/json");
-    res.set_content("no", "text/plain");
+    res.set_content(j.dump(), "application/json");
+//    res.set_content("no", "text/plain");
 //    res.set_content("yeet", "text/plain");
   });
 
   svr.Get("/api/events/all", RES {
     try {
       pqxx::result r = get_from_sql(
-          settings::sql_url,
           "SELECT id, user_id, min_age, is_recurring, name, description, long, lat, "
           "time_start, time_end, location, email "
           "FROM events");
@@ -139,6 +137,77 @@ int main(int argc, char **argv) {
     }
   });
 
+  svr.Get(R"(/api/events/(\d+))", [](const auto &req, auto &res) {
+    try {
+      std::string id = req.matches[1];
+      auto cookies = util::get_cookies(req.get_header_value("Cookie"));
+      auto r = get_from_sql("SELECT id, user_id, min_age, is_recurring, name, description, long, lat, "
+                            "time_start, time_end, location, email "
+                            "FROM events WHERE id='" + id + "'");
+      json j = {
+          {"id", r[0][0].as<std::string>()},
+          {"user_id", r[0][1].as<std::string>()},
+          {"min_age", r[0][2].as<std::string>()},
+          {"is_recurring", r[0][3].as<std::string>()},
+          {"name", r[0][4].as<std::string>()},
+          {"description", r[0][5].as<std::string>()},
+          {"long", r[0][6].as<std::string>()},
+          {"lat", r[0][7].as<std::string>()},
+          {"time_start", r[0][8].as<std::string>()},
+          {"time_end", r[0][9].as<std::string>()},
+          {"location", r[0][10].as<std::string>()},
+          {"email", r[0][11].as<std::string>()},
+      };
+      res.set_content(j.dump(), "application/json");
+    } catch (std::exception &e) {
+      res.set_content("no", "text/plain");
+    }
+  });
+
+  svr.Get(R"(/api/events/(\d+)/rsvp)", [](const auto &req, auto &res) {
+    try {
+      std::string id = req.matches[1];
+      auto cookies = util::get_cookies(req.get_header_value("Cookie"));
+      pqxx::result r = get_from_sql("SELECT user_id FROM event_rsvp WHERE event_id='"
+                                        + id
+                                        + "'");
+      json j;
+      for (auto i: r) {
+        j["rsvp"].push_back(i[0].as<uint64_t>());
+      }
+      res.set_content(j.dump(), "application/json");
+    } catch (std::exception &e) {
+      res.set_content("no", "text/plain");
+    }
+  });
+
+  svr.Post(R"(/api/events/(\d+)/rsvp)", [](const auto &req, auto &res) {
+    try {
+      auto cookies = util::get_cookies(req.get_header_value("Cookie"));
+      json body = json::parse(req.body);
+      std::string event_id = req.matches[1];
+      uint64_t user_id = uid_from_session(cookies["session"]);
+      if (body["rsvp"]) {
+        pqxx::result r = get_from_sql("SELECT COUNT(1) FROM event_rsvp WHERE user_id='"
+                                          + std::to_string(user_id)
+                                          + "' AND event_id='"
+                                          + event_id
+                                          + "'");
+        if (!r[0][0].as<bool>()) {
+          send_to_sql("INSERT INTO event_rsvp (event_id, user_id) VALUES ("
+                          + event_id + ","
+                          + std::to_string(user_id) + ")");
+        }
+      } else {
+        send_to_sql("DELETE FROM event_rsvp WHERE user_id='"
+                        + std::to_string(user_id)
+                        + "'");
+      }
+    } catch (std::exception &e) {
+      res.set_content("no", "text/plain");
+    }
+  });
+
   svr.Post("/api/login", [](
       const httplib::Request &req,
       httplib::Response &res
@@ -158,9 +227,10 @@ int main(int argc, char **argv) {
       }
       std::stringstream ss;
       ss << "INSERT INTO sessions (user_id) VALUES (" << id << ");";
-      send_to_sql( ss.str());
+      send_to_sql(ss.str());
       res.set_header("Set-Cookie",
-                     "session=" + get_from_sql("SELECT uuid FROM sessions WHERE user_id=" + id)[0][0].as<std::string>());
+                     "session="
+                         + get_from_sql("SELECT uuid FROM sessions WHERE user_id=" + id)[0][0].as<std::string>());
       res.set_header("no", "thank you");
 
     } catch (const std::exception &e) {
@@ -174,13 +244,14 @@ int main(int argc, char **argv) {
       httplib::Response &res
   ) {
     json j = json::parse(req.body);
+    auto cookies = util::get_cookies(req.get_header_value("Cookie"));
     try {
+      auto event_id = gen_snowflake(10) >> 1;
       std::stringstream ss;
       ss << "INSERT INTO events (id, user_id, min_age, name, description, lat, long, time_start, time_end, "
             "location, email, is_recurring) VALUES ("
-         << (gen_snowflake(10) >> 1) << ","
-         // << uid_from_session(sql_url, req.get_header_value("auth")) << ","
-         << (gen_snowflake(6464) >> 1) << ","
+         << event_id << ","
+         << uid_from_session(cookies["session"]) << ","
          << j["min_age"].get<int>() << ",'"
          << j["name"].get<std::string>() << "','"
          << j["description"].get<std::string>() << "',"
@@ -193,7 +264,9 @@ int main(int argc, char **argv) {
          << (j["is_recurring"].get<bool>() ? "true" : "false")
          << ")";
       send_to_sql(ss.str());
+      res.set_content(R"({"id":")" + std::to_string(event_id) + "\"}", "application/json");
     } catch (const std::exception &e) {
+      std::cout << e.what() << std::endl;
       res.set_content("no", "text/plain");
       return;
     }
@@ -224,17 +297,10 @@ int main(int argc, char **argv) {
     }
   });
 
-  svr.Options("/api/login", [](const auto &req, auto &res) {
-    res.set_header("Access-Control-Allow-Origin", "*");
-  });
-
   //endregion
 
   svr.set_logger([](const auto &req, const auto &res) {
     std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
-  });
-  svr.set_post_routing_handler([](const auto &req, auto &res) {
-    res.set_header("Access-Control-Allow-Origin", "*");
   });
   svr.set_read_timeout(5, 0); // 5 seconds
   svr.set_write_timeout(5, 0); // 5 seconds

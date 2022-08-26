@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 project(Gryphhacks)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq -pthread")
 
 find_package(OpenSSL REQUIRED)

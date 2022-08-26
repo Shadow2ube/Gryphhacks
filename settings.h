@@ -9,7 +9,7 @@
 
 namespace settings {
 
-std::string sql_url;
+inline std::string sql_url;
 
 }
 

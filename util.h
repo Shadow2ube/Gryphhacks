@@ -27,9 +27,9 @@ uint64_t gen_snowflake(uint64_t mid);
 
 uint64_t uid_from_session(const std::string &uuid, const std::string &url = settings::sql_url);
 
-pqxx::result get_from_sql( const std::string &s,const std::string &url = settings::sql_url);
+pqxx::result get_from_sql(const std::string &s, const std::string &url = settings::sql_url);
 
-void send_to_sql(const std::string &s, const std::string &url=settings::sql_url);
+void send_to_sql(const std::string &s, const std::string &url = settings::sql_url);
 
 std::string make_safe(std::string in);
 
@@ -40,6 +40,11 @@ std::string remove_of(std::string in, const std::string &remove = "\t\n\"\\\'");
 json read_multipart_form(const httplib::Request &req,
                          httplib::Response &res,
                          const httplib::ContentReader &content_reader);
+
+auto split(const std::string &in, const std::string &delim = " ") -> std::vector<std::string>;
+
+auto get_cookies(const std::string& in) -> json;
+
 }
 
 #endif //GRYPHHACKS__UTIL_H_

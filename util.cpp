@@ -108,7 +108,30 @@ std::string util::remove_of(std::string in, const std::string &remove) {
   return in;
 }
 
-uint64_t util::uid_from_session(const std::string &url, const std::string &uuid) {
-  pqxx::result r = get_from_sql(url, "SELECT id FROM sessions WHERE uuid=" + uuid);
-  return r[0][0].as<uint16_t>();
+uint64_t util::uid_from_session(const std::string &uuid, const std::string &url) {
+  pqxx::result r = get_from_sql("SELECT user_id FROM sessions WHERE uuid='" + uuid + "'", url);
+  return r[0][0].as<uint64_t>();
+}
+
+auto util::split(const std::string &in, const std::string &delim) -> std::vector<std::string> {
+  std::vector<std::string> out;
+  int start = 0;
+  int end = in.find(delim);
+  while (end != std::string::npos) {
+    out.emplace_back(in.substr(start, end - start));
+    start = end + delim.size();
+    end = in.find(delim, start);
+  }
+  out.push_back(in.substr(start, end - start));
+  return out;
+}
+
+auto util::get_cookies(const std::string &in) -> json {
+  json out;
+  for (const auto &x: split(in, "; ")) {
+    std::string name = x.substr(0, x.find("="));
+    std::string val = x.substr(x.find("=") + 1, x.size() - 1);
+    out[name] = val;
+  }
+  return out;
 }
