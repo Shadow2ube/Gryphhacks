@@ -43,7 +43,11 @@ json read_multipart_form(const httplib::Request &req,
 
 auto split(const std::string &in, const std::string &delim = " ") -> std::vector<std::string>;
 
-auto get_cookies(const std::string& in) -> json;
+auto get_cookies(const std::string &in) -> json;
+
+inline bool valid_pass(const std::string &hash, const std::string &passwd, const std::string &salt) {
+  return hash == sha256(passwd + salt);
+}
 
 }
 
