@@ -14,5 +14,4 @@ add_executable(Gryphhacks
         main.cpp
         util.h util.cpp endpoints/misc.h endpoints/user.h settings.h endpoints/auth.h endpoints/event.h)
 
-#target_link_libraries(Gryphhacks OpenSSL::SSL websocketpp::websocketpp)
 target_link_libraries(Gryphhacks OpenSSL::SSL /usr/local/lib/uSockets.a)
