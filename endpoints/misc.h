@@ -5,14 +5,16 @@
 #ifndef GRYPHHACKS_ENDPOINTS_MISC_H_
 #define GRYPHHACKS_ENDPOINTS_MISC_H_
 
-#include "../lib/httplib.h"
-
-using namespace httplib;
+#include <uWebSockets/App.h>
 
 namespace misc {
 
-auto ping(const Request &req, Response &res) {
-  res.set_content(R"({"ping": "pong"})", "application/json");
+using namespace uWS;
+typedef uWS::HttpResponse<false> Response;
+typedef uWS::HttpRequest Request;
+
+auto ping(Response *res, Request *req) {
+  res->end(R"({"ping": "pong"})");
 }
 
 }

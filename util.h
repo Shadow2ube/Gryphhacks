@@ -12,12 +12,13 @@
 #include <string>
 #include <pqxx/pqxx>
 
-#include "lib/httplib.h"
 #include "lib/json.hpp"
 #include "settings.h"
 
-using httplib::Server;
 using nlohmann::json;
+typedef uWS::HttpResponse<false> Response;
+typedef uWS::HttpRequest Request;
+
 using namespace std::chrono;
 
 namespace util {
@@ -37,9 +38,7 @@ std::string sha256(const std::string &string);
 
 std::string remove_of(std::string in, const std::string &remove = "\t\n\"\\\'");
 
-json read_multipart_form(const httplib::Request &req,
-                         httplib::Response &res,
-                         const httplib::ContentReader &content_reader);
+json read_multipart_form(Response *res, Request *req);
 
 auto split(const std::string &in, const std::string &delim = " ") -> std::vector<std::string>;
 
@@ -49,6 +48,7 @@ inline bool valid_pass(const std::string &hash, const std::string &passwd, const
   return hash == sha256(passwd + salt);
 }
 
+auto handle(Response *res, const std::function<std::string(std::string)> &func) -> void;
 }
 
 #endif //GRYPHHACKS__UTIL_H_

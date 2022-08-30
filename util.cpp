@@ -2,33 +2,35 @@
 // Created by christian on 5/21/22.
 //
 
+#include <uWebSockets/App.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #include "util.h"
 #include "lib/picosha2.h"
 
-json util::read_multipart_form(const httplib::Request &req,
-                               httplib::Response &res,
-                               const httplib::ContentReader &content_reader) {
-  httplib::MultipartFormDataItems files;
-  content_reader([&](const httplib::MultipartFormData &file) {
-    files.push_back(file);
-    return true;
-  }, [&](const char *data, size_t data_length) {
-    files.back().content.append(data, data_length);
-    return true;
-  });
-  if (files.empty()) {
-    res.set_content("INVALID FORM INPUT", "text/plain");
-    return json::object();
-  }
-  json j = json::object();
-  for (auto &i: files) {
-    j += {i.name, {
-        {"content", remove_of(i.content)},
-        {"content_type", remove_of(i.content_type)},
-        {"file_name", remove_of(i.filename)},
-    }};
-  }
-  return j;
+json util::read_multipart_form(Response *res,
+                               Request *req) {
+//  httplib::MultipartFormDataItems files;
+//  content_reader([&](const httplib::MultipartFormData &file) {
+//    files.push_back(file);
+//    return true;
+//  }, [&](const char *data, size_t data_length) {
+//    files.back().content.append(data, data_length);
+//    return true;
+//  });
+//  if (files.empty()) {
+//    res.set_content("INVALID FORM INPUT", "text/plain");
+//    return json::object();
+//  }
+//  json j = json::object();
+//  for (auto &i: files) {
+//    j += {i.name, {
+//        {"content", remove_of(i.content)},
+//        {"content_type", remove_of(i.content_type)},
+//        {"file_name", remove_of(i.filename)},
+//    }};
+//  }
+//  return j;
 }
 
 char *util::get_local_ip() {
@@ -134,4 +136,19 @@ auto util::get_cookies(const std::string &in) -> json {
     out[name] = val;
   }
   return out;
+}
+
+auto util::handle(Response *res, const std::function<std::string(std::string)> &func) -> void {
+  res->onAborted([=]() {
+    std::cout << "HTTP socket closed before finished!" << std::endl;
+  });
+  std::string buffer;
+  res->onData([res, buffer = std::move(buffer), func](std::string_view data, bool last) mutable {
+    buffer += data;
+
+    if (last) {
+      res->writeHeader("content-type", "application/json");
+      res->end(func(std::string(data)));
+    }
+  });
 }
