@@ -1,10 +1,8 @@
-//#define CPPHTTPLIB_OPENSSL_SUPPORT
-
 #include <iostream>
 #include <string>
 #include <pqxx/pqxx>
 #include <cstdio>
-#include "lib/httplib.h"
+#include <uWebSockets/App.h>
 #include "lib/json.hpp"
 #include "lib/picosha2.h"
 #include "util.h"
@@ -14,9 +12,6 @@
 #include "endpoints/event.h"
 #include "endpoints/auth.h"
 
-#define RES [&](const httplib::Request &req, httplib::Response &res)
-#define REQ [&](const httplib::Request &req, httplib::Response &)
-
 /*
  * TODO:
  * POST REQUESTS:
@@ -25,7 +20,6 @@
  * org_create
  */
 
-using httplib::Server;
 using nlohmann::json;
 using namespace std::chrono;
 using namespace util;
@@ -60,6 +54,35 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
   return perm_level::USER;
 }
 
+//typedef websocketpp::server<websocketpp::config::asio> server;
+//using websocketpp::lib::placeholders::_1;
+//using websocketpp::lib::placeholders::_2;
+//using websocketpp::lib::bind;
+//
+//typedef server::message_ptr message_ptr;
+
+//class echo_handler : public server::handler {
+//  void on_message(connection_ptr con, std::string msg) {
+//    con->write(msg);
+//  }
+//};
+
+//void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg) {
+//  std::cout << "on_message called with hdl: " << hdl.lock().get()
+//            << " and message: " << msg->get_payload() << std::endl;
+//
+//  if (msg->get_payload() == "stop-listening") {
+//    s->stop_listening();
+//    return;
+//  }
+//
+//  try {
+//    s->send(hdl, msg->get_payload(), msg->get_opcode());
+//  } catch (websocketpp::exception const &e) {
+//    std::cout << "Echo failed because: " << "(" << e.what() << ")" << std::endl;
+//  }
+//}
+
 int main(int argc, char **argv) {
   auto ip = get_local_ip();
   if (argc > 1) {
@@ -68,32 +91,41 @@ int main(int argc, char **argv) {
   settings::sql_url = parse_url();
   get_local_ip();
 
-  Server svr;
+//  Server svr;
+  uWS::App svr;
 
   // region api requests
 
-  svr.Get("/api/ping", misc::ping);
 
-  svr.Get(R"(/api/usr/(\d+))", user::user_get);
+  svr.get("/api/ping", misc::ping);
 
-  svr.Post("/api/events/create", event::event_create);
-  svr.Get("/api/events/all", event::event_get_all);
-  svr.Get("/api/events/loc", event::event_get_loc);
-  svr.Get(R"(/api/events/(\d+))", event::event_get);
-  svr.Get(R"(/api/events/(\d+)/rsvp)", event::event_get_rsvp);
-  svr.Post(R"(/api/events/(\d+)/rsvp)", event::event_set_rsvp);
+  svr.get(R"(/api/usr/:user_id)", user::user_get);
 
-  svr.Post("/api/login", auth::login);
-  svr.Post("/api/signup", auth::signup);
+  svr.post("/api/events/create", event::event_create);
+  svr.get("/api/events/all", event::event_get_all);
+  svr.get("/api/events/loc", event::event_get_loc);
+  svr.get(R"(/api/events/:event_id)", event::event_get);
+  svr.get(R"(/api/events/:event_id/rsvp)", event::event_get_rsvp);
+  svr.post(R"(/api/events/:event_id/rsvp)", event::event_set_rsvp);
+
+  svr.post("/api/login", auth::login);
+  svr.post("/api/signup", auth::signup);
 
   //endregion
 
-  svr.set_logger([](const auto &req, const auto &res) {
-    std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
-  });
-  svr.set_read_timeout(5, 0); // 5 seconds
-  svr.set_write_timeout(5, 0); // 5 seconds
+
+//  svr.set_logger([](const auto &req, const auto &res) {
+//    std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
+//  });
+//  svr.set_read_timeout(5, 0); // 5 seconds
+//  svr.set_write_timeout(5, 0); // 5 seconds
   std::cout << "IP: " << ip << std::endl;
-  svr.listen(ip, 8080);
+//  svr.listen(ip, 8080);
+  svr.listen(ip, 8080, [](auto *listenSocket) {
+    if (listenSocket) {
+      std::cout << "Serving content" << std::endl;
+    }
+  });
+  svr.run();
   return 0;
 }
