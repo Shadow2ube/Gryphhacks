@@ -49,6 +49,14 @@ inline bool valid_pass(const std::string &hash, const std::string &passwd, const
 }
 
 auto handle(Response *res, const std::function<std::string(std::string)> &func) -> void;
+
+auto gen_token(uint64_t id,
+               const std::string &f_name,
+               const std::string &l_name,
+               bool is_admin,
+               bool is_host,
+               const std::string &email,
+               std::string secret) -> std::string;
 }
 
 #endif //GRYPHHACKS__UTIL_H_

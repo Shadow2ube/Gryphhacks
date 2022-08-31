@@ -5,6 +5,10 @@
 #include <uWebSockets/App.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <jwt.h>
+#include <picojson/picojson.h>
+
+#include <utility>
 #include "util.h"
 #include "lib/picosha2.h"
 
@@ -151,4 +155,27 @@ auto util::handle(Response *res, const std::function<std::string(std::string)> &
       res->end(func(std::string(data)));
     }
   });
+}
+
+auto util::gen_token(uint64_t id,
+                     const std::string &f_name,
+                     const std::string &l_name,
+                     bool is_admin,
+                     bool is_host,
+                     const std::string &email,
+                     std::string secret) -> std::string {
+  return jwt::create()
+      .set_type("JWT")
+      .set_algorithm("HS256")
+      .set_issued_at(std::chrono::system_clock::now())
+      .set_payload_claim("id", picojson::value(std::to_string(id)))
+      .set_payload_claim("f_name", picojson::value(f_name))
+      .set_payload_claim("l_name", picojson::value(l_name))
+      .set_payload_claim("is_admin", picojson::value(is_admin))
+      .set_payload_claim("is_host", picojson::value(is_host))
+      .set_payload_claim("email", picojson::value(email))
+      .set_expires_at(jwt::date(
+          std::chrono::system_clock::now()
+              + std::chrono::system_clock::duration(2592000s)))
+      .sign(jwt::algorithm::hs256{std::move(secret)});
 }
