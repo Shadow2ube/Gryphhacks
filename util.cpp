@@ -156,6 +156,7 @@ auto util::handle(Response *res, const std::function<std::string(std::string)> &
     }
   });
 }
+
 auto util::gen_token(uint64_t id,
                      const std::string &f_name,
                      const std::string &l_name,

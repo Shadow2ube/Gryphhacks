@@ -35,34 +35,8 @@ std::string parse_url() {
   return line;
 }
 
-enum perm_level {
-  NO_AUTH = 0,
-  USER = 1,
-  HOST = 2,
-  ADMIN = 3
-};
-
-perm_level get_perms(const std::string &url, const std::string &session_id) {
-  try {
-    pqxx::result r = get_from_sql(url,
-                                  "SELECT users.is_admin, users.is_host, sessions.uuid FROM users "
-                                  "INNER JOIN sessions ON sessions.user_id=users.id "
-                                  "WHERE sessions.uuid='" + session_id + "\'");
-    bool is_admin = r[0][0].as<bool>(), is_host = r[0][1].as<bool>();
-    if (is_admin) return perm_level::ADMIN;
-    if (is_host) return perm_level::HOST;
-  } catch (std::exception &ignored) {
-    return perm_level::NO_AUTH;
-  }
-  return perm_level::USER;
-}
-
 using namespace std::chrono_literals;
 int main(int argc, char **argv) {
-//  std::string key = "1234-ABCD";
-//  std::cout << util::gen_token(1234, "Christian", "L", true, true, "1234@mail.com", key) << std::endl;
-//
-//  return 0;
 
   auto ip = get_local_ip();
   if (argc > 1) {
@@ -71,7 +45,6 @@ int main(int argc, char **argv) {
   settings::sql_url = parse_url();
   get_local_ip();
 
-//  Server svr;
   uWS::App svr;
 
   // region api requests
@@ -93,14 +66,7 @@ int main(int argc, char **argv) {
 
   //endregion
 
-
-//  svr.set_logger([](const auto &req, const auto &res) {
-//    std::cout << "req: " << req.body << "\t-\tres: " << res.body << std::endl;
-//  });
-//  svr.set_read_timeout(5, 0); // 5 seconds
-//  svr.set_write_timeout(5, 0); // 5 seconds
   std::cout << "IP: " << ip << std::endl;
-//  svr.listen(ip, 8080);
   svr.listen(ip, 8080, [](auto *listenSocket) {
     if (listenSocket) {
       std::cout << "Serving content" << std::endl;
