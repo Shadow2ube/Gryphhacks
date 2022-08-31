@@ -3,6 +3,9 @@
 #include <pqxx/pqxx>
 #include <cstdio>
 #include <uWebSockets/App.h>
+#include <jwt.h>
+//#include <gen_token-cpp/traits/nlohmann-json/traits.h>
+#include <jwt-cpp/traits/kazuho-picojson/traits.h>
 #include "lib/json.hpp"
 #include "lib/picosha2.h"
 #include "util.h"
@@ -11,8 +14,6 @@
 #include "endpoints/user.h"
 #include "endpoints/event.h"
 #include "endpoints/auth.h"
-#include "hmac.h"
-#include "base64.h"
 
 /*
  * TODO:
@@ -56,7 +57,13 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
   return perm_level::USER;
 }
 
+using namespace std::chrono_literals;
 int main(int argc, char **argv) {
+//  std::string key = "1234-ABCD";
+//  std::cout << util::gen_token(1234, "Christian", "L", true, true, "1234@mail.com", key) << std::endl;
+//
+//  return 0;
+
   auto ip = get_local_ip();
   if (argc > 1) {
     ip = argv[1];
