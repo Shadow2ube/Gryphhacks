@@ -12,6 +12,6 @@ find_package(OpenSSL REQUIRED)
 add_executable(Gryphhacks
         lib/json.hpp lib/picosha2.h
         main.cpp
-        util.h util.cpp endpoints/misc.h endpoints/user.h settings.h endpoints/auth.h endpoints/event.h)
+        util.h util.cpp endpoints/misc.h endpoints/user.h settings.h endpoints/auth.h endpoints/event.h jwt.h hmac.h base64.h)
 
-target_link_libraries(Gryphhacks OpenSSL::SSL /usr/local/lib/uSockets.a)
+target_link_libraries(Gryphhacks OpenSSL::SSL OpenSSL::Crypto /usr/local/lib/uSockets.a)

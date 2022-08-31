@@ -11,6 +11,8 @@
 #include "endpoints/user.h"
 #include "endpoints/event.h"
 #include "endpoints/auth.h"
+#include "hmac.h"
+#include "base64.h"
 
 /*
  * TODO:
@@ -53,35 +55,6 @@ perm_level get_perms(const std::string &url, const std::string &session_id) {
   }
   return perm_level::USER;
 }
-
-//typedef websocketpp::server<websocketpp::config::asio> server;
-//using websocketpp::lib::placeholders::_1;
-//using websocketpp::lib::placeholders::_2;
-//using websocketpp::lib::bind;
-//
-//typedef server::message_ptr message_ptr;
-
-//class echo_handler : public server::handler {
-//  void on_message(connection_ptr con, std::string msg) {
-//    con->write(msg);
-//  }
-//};
-
-//void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg) {
-//  std::cout << "on_message called with hdl: " << hdl.lock().get()
-//            << " and message: " << msg->get_payload() << std::endl;
-//
-//  if (msg->get_payload() == "stop-listening") {
-//    s->stop_listening();
-//    return;
-//  }
-//
-//  try {
-//    s->send(hdl, msg->get_payload(), msg->get_opcode());
-//  } catch (websocketpp::exception const &e) {
-//    std::cout << "Echo failed because: " << "(" << e.what() << ")" << std::endl;
-//  }
-//}
 
 int main(int argc, char **argv) {
   auto ip = get_local_ip();
